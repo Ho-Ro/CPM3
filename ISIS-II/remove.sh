@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm -f ASM80/* PLM80/* UTILS/* README.TXT
+rmdir ASM80 PLM80 UTILS

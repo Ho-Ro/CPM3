@@ -1,0 +1,7 @@
+# Default is to keep crlf line endings
+text=auto
+
+*.asm text eol=crlf
+*.plm text eol=crlf
+*.lib text eol=crlf
+*.lit text eol=crlf
