@@ -44,7 +44,7 @@ unsigned char   getbyte () {
     return x;
 }
 
-main (int argc, char **argv) {
+int main (int argc, char **argv) {
     register unsigned   i, n;
     char    c, buf[64];
     unsigned    type;
@@ -53,7 +53,7 @@ main (int argc, char **argv) {
 	L = 0;
 	if (argc < 2) fpout = stdout;
 	else fpout = fopen(argv[1],"wb");
-    
+
     do {
 	do {
 	    c = getchar ();

@@ -2,10 +2,13 @@
 #
 # Set up environment variables for thames, and run it
 #
-ISIS_F0=`pwd`
-ISIS_F1=`pwd`/PLM80
-ISIS_F2=`pwd`/ASM80
-ISIS_F3=`pwd`/Utils
+ISIS=../ISIS-II
+
+ISIS_F0=.
+ISIS_F1=${ISIS}/PLM80
+ISIS_F2=${ISIS}/ASM80
+ISIS_F3=${ISIS}/UTILS
+
 export ISIS_F0 ISIS_F1 ISIS_F2 ISIS_F3
 
-thames $*
+./thames $*

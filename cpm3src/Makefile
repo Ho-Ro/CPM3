@@ -6,7 +6,7 @@ OBJS=mcd80a.obj mcd80f.obj parse.obj
 HEXS=copysys.hex ccp3.hex ccpdate.hex date.hex device.hex dir.hex \
 	dump.hex ed.hex erase.hex get.hex gencom.hex gencpm.hex help.hex \
 	hexcom.hex patch.hex pip.hex put.hex rename.hex set.hex setdef.hex \
-	show.hex submit.hex type.hex minhlp.hex
+	show.hex submit.hex type.hex minhlp.hex prs0mov.hex
 
 OBJS=copysys.obj ccp3.obj ccpdate.obj date.obj device.obj dir.obj \
 	dump.obj ed.obj erase.obj get.obj gencom.obj gencpm.obj help.obj \
@@ -20,16 +20,16 @@ BLKS=date device dir disp dpb80 ed erase gencom gencpm get hexcom hexpat \
 MCOMS = copysys.com ccp.com date.com device.com dir.com dump.com ed.com \
        erase.com get.com gencom.com gencpm.com help.com hexcom.com patch.com \
        pip.com put.com rename.com save.com set.com setdef.com show.com \
-       submit.com type.com sid.com
+       submit.com type.com sid.com minhlp.com
 
 BDOS = resbdos3.spr bdos3.spr bnkbdos3.spr
 
 ZXCC = zxcc
 THAMES = ./runthames
 
-MAC=mac.com
-RMAC=rmac.com
-LINK=drlink.com
+MAC=../CPM.COM/mac.com
+RMAC=../CPM.COM/rmac.com
+LINK=../CPM.COM/link.com
 
 BINARIES= bdos3.spr     date.com	  erase.com   help.hlp	  README \
 	setdef.com bnkbdos3.spr  device.com  gencom.com  hexcom.com  \
@@ -62,7 +62,7 @@ SOURCES= assemble.txt  disp.plm	    hexcom.asm	  parse.asm	search.plm \
 	dirlbl.asm    help.plm	    _opysys.asm   search.lit  runthames
 
 
-all:	$(MCOMS) $(BDOS) cpmldr.rel help.hlp
+all:	$(MCOMS) $(BDOS) cpmldr.rel
 
 zip:	cpm3src_unix.zip cpm3bin_unix.zip
 
@@ -147,7 +147,7 @@ get.com:	get.hex getrsx.rsx gencom.com hexcom
 	$(ZXCC) gencom.com $@ get.rsx
 
 get.rsx:	getrsx.rel
-	$(ZXCC) $(LINK) getrsx +-[OP]
+	$(ZXCC) $(LINK) getrsx[OP]
 	mv -f getrsx.prl $@
 
 pip.mod:	pip.obj mcd80f.obj inpout.obj
@@ -161,12 +161,13 @@ put.com:	put.hex put.rsx gencom.com hexcom
 	$(ZXCC) gencom.com $@ put.rsx
 
 put.rsx:	putrsx.rel
-	$(ZXCC) $(LINK) putrsx +-[OP]
+	$(ZXCC) $(LINK) putrsx[OP]
 	mv -f putrsx.prl $@
 
-save.com:	save.rsx gencom.com
-	rm -f $@
-	$(ZXCC) gencom save +-[NULL]
+# DOES NOT WORK
+# save.com:	save.rsx gencom.com
+# 	rm -f $@
+# 	$(ZXCC) gencom save [NULL]
 
 set.com:	set.hex dirlbl.rsx gencom.com hexcom
 	./hexcom $@ <$<
@@ -198,13 +199,13 @@ mcd80f.obj:	mcd80f.asm
 
 
 resbdos3.spr:	resbdos.rel
-	$(ZXCC) $(LINK) resbdos3 +-= +resbdos +-[os]
+	$(ZXCC) $(LINK) resbdos3=resbdos[os]
 
 bdos3.spr:	cpmbdosx.rel
-	$(ZXCC) $(LINK) bdos3 +-= cpmbdosx +-[os]
+	$(ZXCC) $(LINK) bdos3=cpmbdosx[os]
 
 bnkbdos3.spr:	cpmbdos.rel
-	$(ZXCC) $(LINK) bnkbdos3 +-= cpmbdos +-[os]
+	$(ZXCC) $(LINK) bnkbdos3=cpmbdos[os]
 
 cpmbdosx.asm:	cpmbdos1.asm conbdos.asm bdos30.asm makedate.lib
 	cat cpmbdos1.asm conbdos.asm bdos30.asm > $@
@@ -242,7 +243,7 @@ timest:	timest.plm
 # SID
 #
 sid.spr:        prs1asm.rel prs2mon.rel
-	$(ZXCC) $(LINK) sid.spr +-= +prs1asm +-, +prs2mon +-[OS]
+	$(ZXCC) $(LINK) sid.spr=prs1asm,prs2mon[OS]
  
 prs0mov.hex:    prs0mov.asm makedate.lib
 	$(ZXCC) $(MAC) prs0mov
@@ -251,7 +252,7 @@ prs1asm.rel:    prs1asm.asm
 	$(ZXCC) $(RMAC) prs1asm
  
 prs2mon.rel:    prs2mon.asm
-	$(ZXCC) $(RMAC) prs2mon                             
+	$(ZXCC) $(RMAC) prs2mon
 
 ##############################################################################
 #
@@ -300,21 +301,27 @@ prs2mon.rel:    prs2mon.asm
 # PRL and RSX files from .REL files 
 #
 %.prl:	%.rel
-	$(ZXCC) $(LINK) `basename $< .rel` +-[OP]
+	$(ZXCC) $(LINK) `basename $< .rel`[OP]
 
 %.spr:	%.rel loader*.tmp
-	$(ZXCC) $(LINK) `basename $< .rel` +-[OS]
+	$(ZXCC) $(LINK) `basename $< .rel`[OS]
 
 %.rsx:	%.rel
-	$(ZXCC) $(LINK) `basename $< .rel` +-[OP]
+	$(ZXCC) $(LINK) `basename $< .rel`[OP]
 	mv -f `basename $< .rel`.prl `basename $< .rel`.rsx
 
 %.rel:	%.asm
 	$(ZXCC) $(RMAC) `basename $< .asm`
 
 #
-# 
 #
+#
+.PHONY: 	clean
 clean:
-	rm -f $(MCOMS) $(HEXS) $(BLKS) *.lst *.rel *.sym *.tra *.rsx *.spr \
-	*.mod *.obj loader*.tmp help.hlp
+	rm -f $(HEXS) $(BLKS) *.lst *.rel *.sym *.tra *.rsx \
+	*.prl *.prn *.mod *.obj loader*.tmp help.hlp \
+	cpmbdos.asm cpmbdosx.asm sid.spr
+
+.PHONY: 	distclean
+distclean:	clean
+	rm -f $(MCOMS) *.spr
