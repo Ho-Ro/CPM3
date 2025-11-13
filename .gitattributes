@@ -2,6 +2,11 @@
 text=auto
 
 *.asm text eol=crlf
+*.dcl text eol=crlf
+*.pli text eol=crlf
 *.plm text eol=crlf
 *.lib text eol=crlf
 *.lit text eol=crlf
+*.txt text eol=crlf
+*.PAT text eol=crlf
+*.TXT text eol=crlf

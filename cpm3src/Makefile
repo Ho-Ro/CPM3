@@ -20,23 +20,24 @@ BLKS=date device dir disp dpb80 ed erase gencom gencpm get hexcom hexpat \
 MCOMS = copysys.com ccp.com date.com device.com dir.com dump.com ed.com \
        erase.com get.com gencom.com gencpm.com help.com hexcom.com patch.com \
        pip.com put.com rename.com save.com set.com setdef.com show.com \
-       submit.com type.com sid.com minhlp.com
+       submit.com type.com sid.com minhlp.com initdir.com
 
 BDOS = resbdos3.spr bdos3.spr bnkbdos3.spr
 
 ZXCC = zxcc
 THAMES = ./runthames
 
-MAC=../CPM.COM/mac.com
-RMAC=../CPM.COM/rmac.com
-LINK=../CPM.COM/link.com
+MAC=mac
+RMAC=rmac
+LINK=link
+PLI=pli
 
 BINARIES= bdos3.spr     date.com	  erase.com   help.hlp	  README \
 	setdef.com bnkbdos3.spr  device.com  gencom.com  hexcom.com  \
 	rename.com	show.com ccp.com       dir.com	  gencpm.com  \
 	patch.com   resbdos3.spr	submit.com copysys.com   dump.com \
 	get.com     pip.com	 save.com	type.com cpmldr.rel    \
-	ed.com	  help.com    put.com	  set.com sid.com
+	ed.com	  help.com    put.com	  set.com sid.com initdir.com
 
 SOURCES= assemble.txt  disp.plm	    hexcom.asm	  parse.asm	search.plm \
 	bdos30.asm    dpb80.plm     hexcom.c	  patch.asm	setbuf.plm \
@@ -45,7 +46,7 @@ SOURCES= assemble.txt  disp.plm	    hexcom.asm	  parse.asm	search.plm \
 	boot.asm      dump.asm	    ldrlwr.asm	  plibios.asm	show.plm \
 	callvers.asm  echovers.asm  _libios3.asm  plidio.asm	sopt.dcl \
 	ccp3.asm      ed.plm	    _lidio.asm	  prs0mov.asm	sopt.inc \
-	ccp3org.asm   		    drlink.com	  prs1asm.asm	sort.plm \
+	ccp3org.asm   initdir.pli   drlink.com	  prs1asm.asm	sort.plm \
 	ccpdate.asm   erase.plm     loader3.asm   prs2mon.asm	submit.plm \
 	chario.asm    fcb.lit	    mac.com	  putf.asm	subrsx.asm \
 	comlit.lit    fd1797sd.asm  main80.plm	  put.plm	timest.plm \
@@ -149,6 +150,9 @@ get.com:	get.hex getrsx.rsx gencom.com hexcom
 get.rsx:	getrsx.rel
 	$(ZXCC) $(LINK) getrsx[OP]
 	mv -f getrsx.prl $@
+
+initdir.com:	initdir.rel mcd80d.rel plidio.rel plibios3.rel
+	$(ZXCC) $(LINK) $@=mcd80d,$<,plidio,plibios3 +-[A]
 
 pip.mod:	pip.obj mcd80f.obj inpout.obj
 	$(THAMES) :F3:link mcd80f.obj,inpout.obj,$<,:F1:plm80.lib to $@
@@ -312,6 +316,15 @@ prs2mon.rel:    prs2mon.asm
 
 %.rel:	%.asm
 	$(ZXCC) $(RMAC) `basename $< .asm`
+
+# PL/I compiler options are
+#	D	disk file print to .prn
+#	L	list source program
+#	S	symbol table display
+#	I	interlist source and machine code
+#
+%.rel:	%.pli
+	$(ZXCC) $(PLI) `basename $< .pli` -"\$$DLSI"
 
 #
 #

@@ -38,9 +38,3 @@ SETDEF:
 
   will now not execute the command C3 if the command C1 failed.
 
-What's missing?
-===============
-INITDIR.COM - because it is written in PL/I and I can't make the
-            PL/I compiler at <http://cdl.uta.edu/cpm> compile it.
-            Apparently a more recent version of the compiler is 
-            required.
