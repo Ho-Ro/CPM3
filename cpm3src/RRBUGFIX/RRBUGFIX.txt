@@ -1,0 +1,21 @@
+; ZPM3's Random Read bug fix applied to DRI BDOS30.ASM 
+; Source: http://cpmarchives.classiccmp.org/cpm/mirrors/www.triton.vg/tesseract/pds/093/zpm3s.arc
+; NOTE: ONLY BRIEFLY TESTED
+
+; Extent is in same directory fcb
+push b! call get$dir$ext! pop b
+cmp c
+jz rrfix ;*** in last extent: treat as new area!
+jnc rseek2 ; jmp if dir$ext > ext
+pop d! push d! inr e! jnz rseek2 ; jmp if write fx
+inr e! pop d! jmp set$lret1 ; error - reading unwritten data
+rrfix:
+pop d! push d ;*** get&save read flag (in E)
+inr e! jnz rseek2 ;*** are we reading? no: ok, open this extent
+lhld info! xchg! jmp ranclose ;*** yes: close extent and open
+rseek2:
+
+; Additions are marked ***.
+
+; To verify the random read bug is quashed see rrbug.zip
+; https://drive.google.com/drive/folders/1kh2WcPUc3hQpLcz7TQ-YQiowrozvxfGw

@@ -2764,10 +2764,30 @@ rseek:
 		mov a,m! cmp c! jz seekok2 ; extents equal
 		call compext! jnz ranclose
 		; Extent is in same directory fcb
+
+RRBUGFIX	equ on
+if RRBUGFIX
+		; ZPM3's Random Read bug fix applied to DRI BDOS30.ASM
+		; https://groups.google.com/g/comp.os.cpm/c/J1C5b1LSvG4/m/BIQAzZDrBgAJ
+		; Additions are marked ***.
+		; To verify the random read bug is quashed see rrbug.zip
+		; https://drive.google.com/drive/folders/1kh2WcPUc3hQpLcz7TQ-YQiowrozvxfGw
+		push b! call get$dir$ext! pop b
+		cmp c
+		jz rrfix ;*** in last extent: treat as new area!
+		jnc rseek2 ; jmp if dir$ext > ext
+		pop d! push d! inr e! jnz rseek2 ; jmp if write fx
+		inr e! pop d! jmp set$lret1 ; error - reading unwritten data
+	rrfix:
+		pop d! push d ;*** get&save read flag (in E)
+		inr e! jnz rseek2 ;*** are we reading? no: ok, open this extent
+		lhld info! xchg! jmp ranclose ;*** yes: close extent and open
+else
 		push b! call get$dir$ext! pop b
 		cmp c! jnc rseek2 ; jmp if dir$ext > ext
 		pop d! push d! inr e! jnz rseek2 ; jmp if write fx
 		inr e! pop d! jmp set$lret1 ; error - reading unwritten data
+endif
 	rseek2:
 		mov m,c ; fcb(ext) = c
 		mov c,a ; c = dir$ext
